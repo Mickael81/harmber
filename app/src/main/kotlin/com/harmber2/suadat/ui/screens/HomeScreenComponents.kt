@@ -1401,6 +1401,68 @@ fun LazyListScope.AccountPlaylistsContainer(
 }
 
 @OptIn(ExperimentalFoundationApi::class)
+fun LazyListScope.SpotifyPlaylistsContainer(
+    viewModel: HomeViewModel,
+    mediaMetadata: MediaMetadata?,
+    isPlaying: Boolean,
+    navController: NavController,
+    playerConnection: PlayerConnection,
+    menuState: MenuState,
+    haptic: HapticFeedback,
+    scope: CoroutineScope,
+) {
+    item {
+        val spotifyPlaylists by viewModel.spotifyPlaylists.collectAsStateWithLifecycle()
+
+        if (spotifyPlaylists.isNotEmpty()) {
+            Column {
+                NavigationTitle(
+                    title = stringResource(R.string.spotify_playlists),
+                    onClick = { navController.navigate("settings/backup_restore") },
+                    modifier = Modifier,
+                )
+                LazyRow(
+                    contentPadding =
+                        WindowInsets.systemBars
+                            .only(WindowInsetsSides.Horizontal)
+                            .asPaddingValues(),
+                ) {
+                    items(
+                        items = spotifyPlaylists,
+                        key = { it.id },
+                    ) { item ->
+                        YouTubeGridItem(
+                            item = PlaylistItem(
+                                id = item.id,
+                                title = item.name,
+                                author = item.owner?.displayName?.let { com.harmber2.suadat.innertube.models.Artist(name = it, id = item.owner?.id ?: "") },
+                                songCountText = item.tracks?.total?.toString(),
+                                thumbnail = item.images.firstOrNull()?.url,
+                                playEndpoint = null,
+                                shuffleEndpoint = null,
+                                radioEndpoint = null,
+                                isEditable = true
+                            ),
+                            isActive = false,
+                            isPlaying = false,
+                            coroutineScope = scope,
+                            modifier = Modifier
+                                .combinedClickable(
+                                    onClick = { navController.navigate("spotify_playlist/${item.id}") },
+                                    onLongClick = {
+                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        // Potential Spotify playlist menu
+                                    }
+                                )
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
 fun LazyListScope.SimilarRecommendationsContainer(
     viewModel: HomeViewModel,
     mediaMetadata: MediaMetadata?,

@@ -1011,6 +1011,15 @@ fun SpotifyPlaylistScreen(
                             )
 
                             androidx.compose.material3.DropdownMenuItem(
+                                text = { Text(stringResource(R.string.spotify_add_songs)) },
+                                onClick = {
+                                    showMenu = false
+                                    navController.navigate("search") // Go to search, from there they can add
+                                },
+                                leadingIcon = { Icon(painterResource(R.drawable.add), null) }
+                            )
+
+                            androidx.compose.material3.DropdownMenuItem(
                                 text = { Text(stringResource(R.string.spotify_import_playlist)) },
                                 onClick = { 
                                     showMenu = false

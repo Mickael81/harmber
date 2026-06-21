@@ -54,6 +54,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadService
 import kotlinx.coroutines.CoroutineScope
@@ -136,6 +137,10 @@ fun PlaylistMenu(
     var songs by remember {
         mutableStateOf(emptyList<Song>())
     }
+
+    val spotifyAccountViewModel: com.harmber2.suadat.spotify.SpotifyAccountViewModel = hiltViewModel()
+    val spotifyAccountState by spotifyAccountViewModel.uiState.collectAsState()
+    val spotifyLibraryViewModel: com.harmber2.suadat.spotify.SpotifyLibraryViewModel = hiltViewModel()
 
     LaunchedEffect(Unit) {
         if (autoPlaylist == false) {
@@ -266,6 +271,33 @@ fun PlaylistMenu(
                             context.getString(R.string.playlist_sync_failed, e.syncErrorDetail(context)),
                             Toast.LENGTH_SHORT,
                         ).show()
+                }
+            }
+        }
+    }
+
+    fun syncPlaylistToSpotify() {
+        coroutineScope.launch(Dispatchers.IO) {
+            try {
+                spotifyLibraryViewModel.syncPlaylistToSpotify(
+                    playlistName = playlist.playlist.name,
+                    songs = songs,
+                    onProgress = { completed, total ->
+                        coroutineScope.launch(Dispatchers.Main) {
+                            syncProgress = PlaylistSyncProgressUi(completed, total)
+                        }
+                    }
+                )
+                withContext(Dispatchers.Main) {
+                    syncProgress = null
+                    Toast.makeText(context, context.getString(R.string.playlist_synced), Toast.LENGTH_SHORT).show()
+                    onDismiss()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    syncProgress = null
+                    Toast.makeText(context, "Failed to sync to Spotify: ${e.syncErrorDetail(context)}", Toast.LENGTH_SHORT).show()
+                    onDismiss()
                 }
             }
         }
@@ -841,6 +873,30 @@ fun PlaylistMenu(
                             },
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     )
+
+                    if (spotifyAccountState.isAuthenticated) {
+                        HorizontalDivider(
+                            modifier = dividerModifier,
+                            color = MaterialTheme.colorScheme.outlineVariant,
+                        )
+
+                        ListItem(
+                            headlineContent = { Text(text = stringResource(R.string.spotify_sync_to_spotify)) },
+                            leadingContent = {
+                                Icon(
+                                    painter = painterResource(R.drawable.spotify_icon),
+                                    contentDescription = null,
+                                )
+                            },
+                            modifier =
+                                Modifier.clickable {
+                                    if (syncProgress == null) {
+                                        syncPlaylistToSpotify()
+                                    }
+                                },
+                            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                        )
+                    }
 
                     HorizontalDivider(
                         modifier = dividerModifier,

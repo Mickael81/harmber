@@ -155,7 +155,7 @@ fun LibraryPlaylistsScreen(
             playlists.filter { playlist ->
                 val name = playlist.playlist.name
                 val matchesName = !name.contains("episode", ignoreCase = true)
-                val matchesTags = selectedTagIds.isEmpty() || playlist.id in filteredPlaylistIds
+                val matchesTags = selectedTagIds.isEmpty() || playlist.id in filteredPlaylistIds || playlist.id.startsWith("SP_")
                 matchesName && matchesTags
             }
         }

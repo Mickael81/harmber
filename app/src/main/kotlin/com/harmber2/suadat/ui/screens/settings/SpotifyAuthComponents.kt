@@ -22,6 +22,7 @@ import android.widget.FrameLayout
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -63,6 +64,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import com.harmber2.suadat.R
@@ -72,6 +75,7 @@ import com.harmber2.suadat.ui.component.DefaultDialog
 import com.harmber2.suadat.ui.component.PreferenceEntry
 import com.harmber2.suadat.ui.component.PreferenceGroupScope
 import com.harmber2.suadat.ui.component.SwitchPreference
+import com.harmber2.suadat.utils.isTvDevice
 import com.harmber2.suadat.utils.resetAuthWebViewSession
 
 val SpotifyAccountIconSize = 44.dp
@@ -165,13 +169,7 @@ fun SpotifyLoginSheet(
         }
     }
 
-    ModalBottomSheet(
-        modifier = Modifier.fillMaxHeight(),
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-        containerColor = MaterialTheme.colorScheme.surface,
-    ) {
+    val content: @Composable () -> Unit = {
         Column(
             modifier =
                 Modifier
@@ -282,6 +280,28 @@ fun SpotifyLoginSheet(
                 },
             )
         }
+    }
+
+    if (context.isTvDevice()) {
+        Dialog(
+            onDismissRequest = onDismiss,
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.surface,
+                content = content
+            )
+        }
+    } else {
+        ModalBottomSheet(
+            modifier = Modifier.fillMaxSize(),
+            onDismissRequest = onDismiss,
+            sheetState = sheetState,
+            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+            containerColor = MaterialTheme.colorScheme.surface,
+            content = { content() }
+        )
     }
 }
 

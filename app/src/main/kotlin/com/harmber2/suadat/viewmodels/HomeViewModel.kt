@@ -47,6 +47,8 @@ import com.harmber2.suadat.innertube.pages.HomePage
 import com.harmber2.suadat.innertube.utils.completed
 import com.harmber2.suadat.innertube.utils.hasYouTubeLoginCookie
 import com.harmber2.suadat.models.SimilarRecommendation
+import com.harmber2.suadat.spotify.SpotifyLibraryRepository
+import com.harmber2.suadat.spotify.models.SpotifyPlaylist
 import com.harmber2.suadat.utils.SavedAccount
 import com.harmber2.suadat.utils.SpeedDialPinType
 import com.harmber2.suadat.utils.SyncUtils
@@ -94,6 +96,7 @@ class HomeViewModel
         @ApplicationContext val context: Context,
         val database: MusicDatabase,
         val syncUtils: SyncUtils,
+        val spotifyRepository: SpotifyLibraryRepository,
     ) : ViewModel() {
         val isRefreshing = MutableStateFlow(false)
         val isLoading = MutableStateFlow(false)
@@ -111,6 +114,7 @@ class HomeViewModel
         val keepListening = MutableStateFlow<List<LocalItem>?>(null)
         val similarRecommendations = MutableStateFlow<List<SimilarRecommendation>?>(null)
         val accountPlaylists = MutableStateFlow<List<PlaylistItem>?>(null)
+        val spotifyPlaylists = spotifyRepository.playlists.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
         val homePage = MutableStateFlow<HomePage?>(null)
         val explorePage = MutableStateFlow<ExplorePage?>(null)
         val selectedChip = MutableStateFlow<HomePage.Chip?>(null)
@@ -616,6 +620,7 @@ class HomeViewModel
                     supervisorScope {
                         launch { load() }
                         launch { refreshQuickPicks() }
+                        launch { spotifyRepository.refreshPlaylists() }
                     }
                 } catch (e: CancellationException) {
                     throw e

@@ -873,6 +873,24 @@ object Spotify {
     // ── Playlist Mutations (GQL) ──────────────────────────────────────
 
     /**
+     * Creates a new Spotify playlist via GQL mutation.
+     */
+    suspend fun createPlaylist(name: String): Result<String> =
+        runCatching {
+            val vars =
+                buildJsonObject {
+                    put("name", name)
+                }
+            val response = graphqlPost(
+                operationName = "createPlaylist",
+                variables = vars,
+            )
+            val playlistUri = response.obj("data")?.obj("createPlaylist")?.str("uri")
+                ?: throw SpotifyException(500, "Invalid createPlaylist response")
+            playlistUri.substringAfterLast(":")
+        }
+
+    /**
      * Adds tracks to a Spotify playlist via GQL mutation.
      * @param playlistId Playlist ID (without the `spotify:playlist:` prefix).
      * @param trackUris Full Spotify URIs, e.g. `["spotify:track:abc123"]`.

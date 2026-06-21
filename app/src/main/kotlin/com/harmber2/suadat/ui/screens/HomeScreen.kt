@@ -405,6 +405,17 @@ fun HomeScreen(
                         scope = scope,
                     )
 
+                    SpotifyPlaylistsContainer(
+                        viewModel = viewModel,
+                        mediaMetadata = mediaMetadata,
+                        isPlaying = isPlaying,
+                        navController = navController,
+                        playerConnection = playerConnection,
+                        menuState = menuState,
+                        haptic = haptic,
+                        scope = scope,
+                    )
+
                     forgottenFavorites?.takeIf { it.isNotEmpty() }?.let { favorites ->
                         item {
                             NavigationTitle(

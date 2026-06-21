@@ -220,6 +220,44 @@ class SpotifyLibraryRepository
                 tracks
             }
 
+        suspend fun createPlaylist(name: String): String =
+            withContext(Dispatchers.IO) {
+                ensureAuthenticated()
+                spotifyCallWithTokenRetry {
+                    Spotify.createPlaylist(name).getOrThrow()
+                }
+            }
+
+        suspend fun syncPlaylistToSpotify(
+            playlistName: String,
+            songs: List<com.harmber2.suadat.db.entities.Song>,
+            onProgress: (Int, Int) -> Unit
+        ) {
+            withContext(Dispatchers.IO) {
+                ensureAuthenticated()
+                val spotifyPlaylists = refreshPlaylists()
+                var spotifyId = spotifyPlaylists.find { it.name.equals(playlistName, ignoreCase = true) }?.id
+                if (spotifyId == null) {
+                    spotifyId = createPlaylist(playlistName)
+                }
+                
+                val spotifyUris = mutableListOf<String>()
+                songs.forEachIndexed { index, song ->
+                    onProgress(index, songs.size)
+                    val query = "${song.song.title} ${song.artists.joinToString(" ") { it.name }}"
+                    val result = Spotify.search(query, listOf("track"), limit = 1).getOrNull()
+                    result?.tracks?.items?.firstOrNull()?.uri?.let {
+                        spotifyUris.add(it)
+                    }
+                }
+                
+                if (spotifyUris.isNotEmpty()) {
+                    addTracksToPlaylist(spotifyId, spotifyUris)
+                }
+                onProgress(songs.size, songs.size)
+            }
+        }
+
         suspend fun addTracksToPlaylist(
             playlistId: String,
             trackUris: List<String>,

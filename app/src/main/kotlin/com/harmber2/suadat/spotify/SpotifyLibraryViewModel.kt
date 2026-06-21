@@ -44,4 +44,12 @@ class SpotifyLibraryViewModel
                 repository.refreshPlaylists()
             }
         }
+
+        suspend fun syncPlaylistToSpotify(
+            playlistName: String,
+            songs: List<com.harmber2.suadat.db.entities.Song>,
+            onProgress: (Int, Int) -> Unit
+        ) {
+            repository.syncPlaylistToSpotify(playlistName, songs, onProgress)
+        }
     }
