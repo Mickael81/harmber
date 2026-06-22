@@ -1,75 +1,186 @@
-# Harmber
+# <p align="center">🎵 Harmber</p>
 
-Harmber is a modern Android music application built with Kotlin, designed to provide a fast and seamless listening experience. It features Spotify integration, a clean user interface, and optimized performance for Android devices.
+<p align="center">
+A modern Material 3 music streaming experience for Android.
+</p>
 
-## Features
+<p align="center">
+<img src="assets/icon.png" width="160">
+</p>
 
-* Modern Material Design interface
-* Spotify integration
-* Fast and lightweight
-* Smooth playback experience
-* Dark mode support
-* Optimized for Android devices
-* Regular updates and improvements
+<p align="center">
 
-## Installation
+![GitHub release](https://img.shields.io/github/v/release/suadatbiniqbal/harmber?style=for-the-badge)
+![Downloads](https://img.shields.io/github/downloads/suadatbiniqbal/harmber/total?style=for-the-badge)
+![GitHub Stars](https://img.shields.io/github/stars/suadatbiniqbal/harmber?style=for-the-badge)
+![GitHub Forks](https://img.shields.io/github/forks/suadatbiniqbal/harmber?style=for-the-badge)
+![License](https://img.shields.io/github/license/suadatbiniqbal/harmber?style=for-the-badge)
+![Android](https://img.shields.io/badge/Android-8.0%2B-green?style=for-the-badge)
+![Kotlin](https://img.shields.io/badge/Kotlin-2.x-blue?style=for-the-badge)
+![Compose](https://img.shields.io/badge/Jetpack-Compose-orange?style=for-the-badge)
+![Material3](https://img.shields.io/badge/Material-3-purple?style=for-the-badge)
 
-### Clone the repository
+</p>
 
-```bash
-git clone https://github.com/suadatbiniqbal/harmber.git
-```
+---
 
-### Build
+# ✨ Features
 
-1. Open the project in Android Studio.
-2. Sync Gradle dependencies.
-3. Build and run the application.
+* 🎵 Music Streaming
+* ❤️ Favorites and Likes
+* 📂 Playlist Support
+* 🔎 Powerful Search
+* 🌙 Dark Mode
+* 🎨 Material 3 Design
+* ⚡ Fast and Lightweight
+* 🔔 Push Notifications
+* 📥 Offline Caching
+* 🚀 Smooth Animations
+* 📱 Android 8.0+ Support
+* 🎧 Background Playback
+* 🔄 Regular Updates
+* 🛡 Crash Reporting
+* 🌈 Dynamic Colors
 
-## Requirements
+---
 
-* Android 8.0 (API 26) or higher
-* Android Studio Meerkat or newer
-* JDK 17
+# 📸 Screenshots
 
-## Technology Stack
+<p align="center">
+<img src="assets/ss1.png" width="220">
+<img src="assets/ss2.png" width="220">
+<img src="assets/ss3.png" width="220">
+</p>
+
+<p align="center">
+<img src="assets/ss4.png" width="220">
+<img src="assets/ss5.png" width="220">
+</p>
+
+---
+
+# 📥 Download
+
+<p align="center">
+
+<a href="https://github.com/suadatbiniqbal/harmber/releases/latest">
+<img src="https://img.shields.io/badge/Download-Latest%20Release-blue?style=for-the-badge">
+</a>
+
+</p>
+
+Download the latest APK from the Releases section.
+
+---
+
+# 🚀 Installation
+
+1. Download the latest APK.
+2. Enable "Install Unknown Apps".
+3. Install Harmber.
+4. Start enjoying your music.
+
+---
+
+# 🛠 Built With
 
 * Kotlin
-* Android SDK
-* AndroidX
-* Material Components
-* Retrofit
+* Jetpack Compose
+* Material 3
+* Firebase
+* Media3 / ExoPlayer
 * Coroutines
-* Spotify Web API
+* Coil
+* Navigation Compose
+* ViewModel
+* Room Database
 
-## Spotify Integration
+---
 
-Harmber integrates with Spotify services to provide access to music metadata and related features. A Spotify account may be required for certain functionality.
+# 📊 Stats
 
-## Special Thanks
+![Repo Size](https://img.shields.io/github/repo-size/suadatbiniqbal/harmber?style=flat-square)
+![Issues](https://img.shields.io/github/issues/suadatbiniqbal/harmber)
+![Pull Requests](https://img.shields.io/github/issues-pr/suadatbiniqbal/harmber)
+![Last Commit](https://img.shields.io/github/last-commit/suadatbiniqbal/harmber)
+![Contributors](https://img.shields.io/github/contributors/suadatbiniqbal/harmber)
 
-Special thanks to the developers and communities behind these projects for their inspiration and contributions to the Android music ecosystem:
+---
 
-* InnerTune
-* KoiVerse
-* MetroList
+# 🤝 Contributing
 
-Their work and ideas have helped shape parts of Harmber and have been invaluable resources during development.
+Contributions are welcome!
 
-## Contributing
+1. Fork the repository.
+2. Create a branch.
 
-Contributions are welcome. Feel free to open issues and pull requests.
+```bash
+git checkout -b feature-name
+```
 
-## License
+3. Commit your changes.
+
+```bash
+git commit -m "Add feature"
+```
+
+4. Push to GitHub.
+
+```bash
+git push origin feature-name
+```
+
+5. Open a Pull Request.
+
+Please read:
+
+* CODE_OF_CONDUCT.md
+* CONTRIBUTING.md
+
+---
+
+# 🐛 Bug Reports
+
+If you encounter bugs, please include:
+
+* Device model
+* Android version
+* Harmber version
+* Crash logs (if available)
+
+---
+
+# ❤️ Support
+
+If you like Harmber:
+
+⭐ Star the repository
+
+🐛 Report bugs
+
+💡 Suggest features
+
+🚀 Share with friends
+
+---
+
+# 📧 Contact
+
+Developer: **Suadat Bin Iqbal**
+
+Email: **[vetraisgod@gmail.com](mailto:vetraisgod@gmail.com)**
+
+---
+
+# 📜 License
 
 This project is licensed under the MIT License.
 
-## Developer
+---
 
-Suadat Bin Iqbal
+<p align="center">
+Made with ❤️ and Kotlin
+<br>
+For music lovers everywhere 🎶
+</p>
 
-GitHub: https://github.com/suadatbiniqbal
-
-## Disclaimer
-
-Harmber is an independent project and is not affiliated with, endorsed by, or sponsored by Spotify. Spotify is a trademark of Spotify AB.
