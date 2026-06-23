@@ -181,6 +181,7 @@ If you find Harmber useful:
 
 ---
 
+
 > [!IMPORTANT]
 > **Harmber is actively maintained and receives regular updates.**
 >
