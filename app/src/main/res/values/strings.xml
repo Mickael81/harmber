@@ -1167,4 +1167,8 @@ InnerTune's Weblate instead. -->
     <string name="spotify_import_error">Import failed: %1$s</string>
     <string name="spotify_import_name_hint">Playlist name</string>
     <string name="spotify_import_confirm">Import</string>
+    <string name="spotify_canvas">Spotify Canvas</string>
+    <string name="spotify_canvas_desc">Show Spotify Canvas as an animated background</string>
+    <string name="spotify_recommendations">Spotify Recommendations</string>
+    <string name="spotify_recommendations_desc">Get song recommendations from Spotify based on currently playing song</string>
 </resources>

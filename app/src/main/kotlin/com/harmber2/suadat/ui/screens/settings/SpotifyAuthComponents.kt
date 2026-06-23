@@ -71,6 +71,8 @@ import androidx.compose.ui.window.DialogProperties
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import com.harmber2.suadat.R
+import com.harmber2.suadat.constants.SpotifyCanvasEnabledKey
+import com.harmber2.suadat.constants.SpotifyRecommendationsEnabledKey
 import com.harmber2.suadat.spotify.SpotifyAccountUiState
 import com.harmber2.suadat.spotify.SpotifyAuth
 import com.harmber2.suadat.ui.component.DefaultDialog
@@ -78,6 +80,7 @@ import com.harmber2.suadat.ui.component.PreferenceEntry
 import com.harmber2.suadat.ui.component.PreferenceGroupScope
 import com.harmber2.suadat.ui.component.SwitchPreference
 import com.harmber2.suadat.utils.isTvDevice
+import com.harmber2.suadat.utils.rememberPreference
 import com.harmber2.suadat.utils.resetAuthWebViewSession
 
 val SpotifyAccountIconSize = 44.dp
@@ -577,6 +580,30 @@ fun PreferenceGroupScope.spotifyAccountPreferences(
                 }
             },
             isEnabled = false,
+        )
+    }
+
+    item {
+        val (spotifyCanvas, onSpotifyCanvasChange) = rememberPreference(SpotifyCanvasEnabledKey, false)
+        SwitchPreference(
+            title = { Text(stringResource(R.string.spotify_canvas)) },
+            description = stringResource(R.string.spotify_canvas_desc),
+            icon = { Icon(painterResource(R.drawable.motion_photos_on), null) },
+            checked = spotifyCanvas,
+            onCheckedChange = onSpotifyCanvasChange,
+            isEnabled = !state.isLoading,
+        )
+    }
+
+    item {
+        val (spotifyRecs, onSpotifyRecsChange) = rememberPreference(SpotifyRecommendationsEnabledKey, false)
+        SwitchPreference(
+            title = { Text(stringResource(R.string.spotify_recommendations)) },
+            description = stringResource(R.string.spotify_recommendations_desc),
+            icon = { Icon(painterResource(R.drawable.auto_awesome), null) },
+            checked = spotifyRecs,
+            onCheckedChange = onSpotifyRecsChange,
+            isEnabled = !state.isLoading,
         )
     }
 

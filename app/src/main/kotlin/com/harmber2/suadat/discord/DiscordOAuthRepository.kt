@@ -89,7 +89,8 @@ object DiscordOAuthRepository {
             listOf(
                 "openid",
                 "identify",
-                "sdk.social_layer_presence",
+                "activities.read",
+                "activities.write",
             ).joinToString(separator = " ")
 
         val uri =

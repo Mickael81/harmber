@@ -33,6 +33,7 @@ import com.harmber2.suadat.constants.SpeedDialSongIdsKey
 import com.harmber2.suadat.constants.VisitorDataKey
 import com.harmber2.suadat.constants.YtmSyncKey
 import com.harmber2.suadat.db.MusicDatabase
+import com.harmber2.suadat.constants.SpotifyRecommendationsEnabledKey
 import com.harmber2.suadat.db.entities.*
 import com.harmber2.suadat.extensions.toEnum
 import com.harmber2.suadat.innertube.YouTube
@@ -47,6 +48,7 @@ import com.harmber2.suadat.innertube.pages.HomePage
 import com.harmber2.suadat.innertube.utils.completed
 import com.harmber2.suadat.innertube.utils.hasYouTubeLoginCookie
 import com.harmber2.suadat.models.SimilarRecommendation
+import com.harmber2.suadat.spotify.Spotify
 import com.harmber2.suadat.spotify.SpotifyLibraryRepository
 import com.harmber2.suadat.utils.SavedAccount
 import com.harmber2.suadat.utils.SpeedDialPinType
@@ -55,6 +57,8 @@ import com.harmber2.suadat.utils.dataStore
 import com.harmber2.suadat.utils.get
 import com.harmber2.suadat.utils.parseSpeedDialPins
 import com.harmber2.suadat.utils.reportException
+import com.harmber2.suadat.spotify.SpotifyCanvasManager
+import com.harmber2.suadat.spotify.models.SpotifyTrack
 import com.harmber2.suadat.utils.toPlaybackAuthState
 import timber.log.Timber
 import javax.inject.Inject
@@ -112,6 +116,7 @@ class HomeViewModel
         val forgottenFavorites = MutableStateFlow<List<Song>?>(null)
         val keepListening = MutableStateFlow<List<LocalItem>?>(null)
         val similarRecommendations = MutableStateFlow<List<SimilarRecommendation>?>(null)
+        val spotifyRecommendations = MutableStateFlow<List<SpotifyTrack>>(emptyList())
         val accountPlaylists = MutableStateFlow<List<PlaylistItem>?>(null)
         val spotifyPlaylists = spotifyRepository.playlists.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
         val homePage = MutableStateFlow<HomePage?>(null)
@@ -375,6 +380,7 @@ class HomeViewModel
                 updateAllLocalItems()
 
                 viewModelScope.launch(Dispatchers.IO) {
+                    spotifyRepository.restoreSession()
                     spotifyRepository.restoreCachedPlaylists()
                     kotlinx.coroutines.delay(5000)
                     loadSimilarRecommendations()
@@ -465,6 +471,31 @@ class HomeViewModel
                     ?.sections
                     ?.flatMap { it.items }
                     .orEmpty()
+            
+            if (context.dataStore.get(SpotifyRecommendationsEnabledKey, false)) {
+                loadSpotifyRecommendations()
+            }
+        }
+
+        fun loadSpotifyRecommendations(mediaId: String? = null, title: String? = null, artist: String? = null, duration: Int? = null) {
+            viewModelScope.launch(Dispatchers.IO) {
+                if (!Spotify.isAuthenticated()) return@launch
+                
+                val (tId, tTitle, tArtist, tDuration) = if (mediaId != null) {
+                    listOf(mediaId, title ?: "", artist ?: "", duration)
+                } else {
+                    val lastSong = database.recentSongs(limit = 1).first().firstOrNull() ?: return@launch
+                    listOf(lastSong.id, lastSong.song.title, lastSong.artists.firstOrNull()?.name ?: "", lastSong.song.duration)
+                }
+                
+                spotifyRecommendations.value = SpotifyCanvasManager.getRecommendations(
+                    context = context,
+                    mediaId = tId as String,
+                    title = tTitle as String,
+                    artist = tArtist as String,
+                    durationSec = tDuration as? Int
+                )
+            }
         }
 
         private fun clearAccountData() {

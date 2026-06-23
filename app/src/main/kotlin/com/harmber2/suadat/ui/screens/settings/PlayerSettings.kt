@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -204,10 +205,49 @@ fun PlayerSettings(
             defaultValue = false,
         )
 
+    var showLosslessWarningDialog by remember { mutableStateOf(false) }
+    var pendingAudioQuality by remember { mutableStateOf<AudioQuality?>(null) }
+    var pendingPlayerStreamClient by remember { mutableStateOf<PlayerStreamClient?>(null) }
+
     var showArtistSeparatorsDialog by remember { mutableStateOf(false) }
     var showTagsManagementDialog by remember { mutableStateOf(false) }
     var showExternalDownloaderPackageDialog by remember { mutableStateOf(false) }
     val database = LocalDatabase.current
+
+    if (showLosslessWarningDialog) {
+        com.harmber2.suadat.ui.component.ActionPromptDialog(
+            title = stringResource(R.string.experimental_feature),
+            onDismiss = {
+                showLosslessWarningDialog = false
+                pendingAudioQuality = null
+                pendingPlayerStreamClient = null
+            },
+            onConfirm = {
+                pendingAudioQuality?.let {
+                    onAudioQualityChange(it)
+                }
+                pendingPlayerStreamClient?.let {
+                    onPlayerStreamClientChange(it)
+                    if (it == PlayerStreamClient.HI_RES_LOSSLESS) {
+                        onAudioQualityChange(AudioQuality.LOSSLESS)
+                    }
+                }
+                showLosslessWarningDialog = false
+                pendingAudioQuality = null
+                pendingPlayerStreamClient = null
+            },
+            onCancel = {
+                showLosslessWarningDialog = false
+                pendingAudioQuality = null
+                pendingPlayerStreamClient = null
+            },
+        ) {
+            Text(
+                text = "Lossless and Hi-Res playback are currently in Beta. Enabling them will significantly increase data consumption and may cause playback issues on unstable networks.",
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+    }
 
     if (showArtistSeparatorsDialog) {
         ArtistSeparatorsDialog(
@@ -260,14 +300,21 @@ fun PlayerSettings(
                     title = { Text(stringResource(R.string.audio_quality)) },
                     icon = { Icon(painterResource(R.drawable.graphic_eq), null) },
                     selectedValue = audioQuality,
-                    onValueSelected = onAudioQualityChange,
+                    onValueSelected = {
+                        if (it == AudioQuality.LOSSLESS) {
+                            pendingAudioQuality = it
+                            showLosslessWarningDialog = true
+                        } else {
+                            onAudioQualityChange(it)
+                        }
+                    },
                     valueText = {
                         when (it) {
                             AudioQuality.HIGHEST -> stringResource(R.string.audio_quality_max)
                             AudioQuality.HIGH -> stringResource(R.string.audio_quality_high)
                             AudioQuality.AUTO -> stringResource(R.string.audio_quality_auto)
                             AudioQuality.LOW -> stringResource(R.string.audio_quality_low)
-                            AudioQuality.LOSSLESS -> stringResource(R.string.audio_quality_lossless)
+                            AudioQuality.LOSSLESS -> "${stringResource(R.string.audio_quality_lossless)} (Beta)"
                             AudioQuality.OPUS -> stringResource(R.string.audio_quality_opus)
                         }
                     },
@@ -288,11 +335,18 @@ fun PlayerSettings(
                                 PlayerStreamClient.HI_RES_LOSSLESS,
                             )
                         },
-                    onValueSelected = onPlayerStreamClientChange,
+                    onValueSelected = {
+                        if (it == PlayerStreamClient.HI_RES_LOSSLESS) {
+                            pendingPlayerStreamClient = it
+                            showLosslessWarningDialog = true
+                        } else {
+                            onPlayerStreamClientChange(it)
+                        }
+                    },
                     valueText = {
                         when (it) {
                             PlayerStreamClient.ANDROID_VR -> stringResource(R.string.player_stream_client_android_vr)
-                            PlayerStreamClient.HI_RES_LOSSLESS -> stringResource(R.string.player_stream_client_hi_res_lossless)
+                            PlayerStreamClient.HI_RES_LOSSLESS -> "${stringResource(R.string.player_stream_client_hi_res_lossless)} (Beta)"
                             else -> stringResource(R.string.player_stream_client_web_remix)
                         }
                     },

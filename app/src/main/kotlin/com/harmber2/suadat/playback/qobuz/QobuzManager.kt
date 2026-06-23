@@ -32,9 +32,9 @@ object QobuzManager {
     }
 
     private val client = OkHttpClient.Builder()
-        .connectTimeout(15, TimeUnit.SECONDS)
-        .readTimeout(15, TimeUnit.SECONDS)
-        .writeTimeout(15, TimeUnit.SECONDS)
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
         .build()
 
     suspend fun tryQobuz(title: String, artist: String, durationSeconds: Int?): YTPlayerUtils.PlaybackData? = withContext(Dispatchers.IO) {

@@ -21,6 +21,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.TextContent
+import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
@@ -48,6 +49,8 @@ import com.harmber2.suadat.spotify.models.SpotifyPlaylistTracksRef
 import com.harmber2.suadat.spotify.models.SpotifyRecommendations
 import com.harmber2.suadat.spotify.models.SpotifySavedTrack
 import com.harmber2.suadat.spotify.models.SpotifySearchResult
+import com.harmber2.suadat.spotify.models.SpotifyCanvasResponse
+import com.harmber2.suadat.spotify.models.SpotifyCanvas
 import com.harmber2.suadat.spotify.models.SpotifySimpleAlbum
 import com.harmber2.suadat.spotify.models.SpotifySimpleArtist
 import com.harmber2.suadat.spotify.models.SpotifyTrack
@@ -1717,6 +1720,32 @@ object Spotify {
         }
 
     fun isAuthenticated(): Boolean = accessToken != null
+
+    suspend fun canvas(trackUri: String): Result<SpotifyCanvas?> =
+        runCatching {
+            val token = accessToken ?: throw SpotifyException(401, "Not authenticated")
+            val response =
+                restClient.post("https://spclient.wg.spotify.com/canvas-manager/api/v1/canvases") {
+                    header("Authorization", "Bearer $token")
+                    header("Accept", "application/json")
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        buildJsonObject {
+                            putJsonArray("track_uris") {
+                                add(trackUri)
+                            }
+                        }
+                    )
+                }
+
+            if (response.status == HttpStatusCode.OK) {
+                val body = response.bodyAsText()
+                val canvasResponse = json.decodeFromString<SpotifyCanvasResponse>(body)
+                canvasResponse.canvases.firstOrNull()
+            } else {
+                null
+            }
+        }
 }
 
 @kotlinx.serialization.Serializable

@@ -11,6 +11,7 @@ import androidx.compose.runtime.Immutable
 import com.harmber2.suadat.db.entities.Song
 import com.harmber2.suadat.db.entities.SongEntity
 import com.harmber2.suadat.innertube.models.SongItem
+import com.harmber2.suadat.spotify.models.SpotifyTrack
 import com.harmber2.suadat.ui.utils.resize
 import java.io.Serializable
 import java.time.LocalDateTime
@@ -119,4 +120,29 @@ fun SongItem.toMediaMetadata() =
             },
         explicit = explicit,
         setVideoId = setVideoId,
+    )
+
+fun SpotifyTrack.toMediaMetadata() =
+    MediaMetadata(
+        id = "",
+        title = name,
+        artists =
+            artists.map {
+                MediaMetadata.Artist(
+                    id = it.id,
+                    name = it.name,
+                    thumbnailUrl = null,
+                )
+            },
+        duration = durationMs / 1000,
+        thumbnailUrl = album?.images?.firstOrNull()?.url,
+        album =
+            album?.let {
+                MediaMetadata.Album(
+                    id = it.id,
+                    title = it.name,
+                )
+            },
+        explicit = explicit,
+        spotifyTrackId = id,
     )

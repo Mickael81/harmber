@@ -92,6 +92,7 @@ fun HomeScreen(
     val (disableBlur) = rememberPreference(DisableBlurKey, false)
     val (showHomeCategoryChips) = rememberPreference(ShowHomeCategoryChipsKey, true)
     val (quickPicksDisplayMode) = rememberEnumPreference(QuickPicksDisplayModeKey, QuickPicksDisplayMode.CARD)
+    val (spotifyRecommendationsEnabled) = rememberPreference(com.harmber2.suadat.constants.SpotifyRecommendationsEnabledKey, false)
     val isLoggedIn =
         remember(innerTubeCookie) {
             hasYouTubeLoginCookie(innerTubeCookie)
@@ -158,6 +159,17 @@ fun HomeScreen(
 
     LaunchedEffect(forgottenFavorites) {
         forgottenFavoritesLazyGridState.scrollToItem(0)
+    }
+
+    LaunchedEffect(mediaMetadata, spotifyRecommendationsEnabled) {
+        if (spotifyRecommendationsEnabled) {
+            viewModel.loadSpotifyRecommendations(
+                mediaId = mediaMetadata?.id,
+                title = mediaMetadata?.title,
+                artist = mediaMetadata?.artists?.firstOrNull()?.name,
+                duration = mediaMetadata?.duration
+            )
+        }
     }
 
     // Capture M3 Expressive colors from theme outside drawBehind
@@ -437,6 +449,17 @@ fun HomeScreen(
                     }
 
                     SimilarRecommendationsContainer(
+                        viewModel = viewModel,
+                        mediaMetadata = mediaMetadata,
+                        isPlaying = isPlaying,
+                        navController = navController,
+                        playerConnection = playerConnection,
+                        menuState = menuState,
+                        haptic = haptic,
+                        scope = scope,
+                    )
+
+                    SpotifyRecommendationsContainer(
                         viewModel = viewModel,
                         mediaMetadata = mediaMetadata,
                         isPlaying = isPlaying,

@@ -111,6 +111,8 @@ import com.harmber2.suadat.models.toMediaMetadata
 import com.harmber2.suadat.playback.PlayerConnection
 import com.harmber2.suadat.playback.queues.ListQueue
 import com.harmber2.suadat.playback.queues.YouTubeQueue
+import com.harmber2.suadat.spotify.SpotifyRecommendationsQueue
+import com.harmber2.suadat.spotify.models.SpotifyTrack
 import com.harmber2.suadat.ui.component.AlbumGridItem
 import com.harmber2.suadat.ui.component.ArtistGridItem
 import com.harmber2.suadat.ui.component.LocalMenuState
@@ -1450,6 +1452,73 @@ fun LazyListScope.spotifyPlaylistsContainer(
                                     onLongClick = {
                                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                         // Potential Spotify playlist menu
+                                    }
+                                )
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+fun LazyListScope.SpotifyRecommendationsContainer(
+    viewModel: HomeViewModel,
+    mediaMetadata: MediaMetadata?,
+    isPlaying: Boolean,
+    navController: NavController,
+    playerConnection: PlayerConnection,
+    menuState: MenuState,
+    haptic: HapticFeedback,
+    scope: CoroutineScope,
+) {
+    item {
+        val spotifyRecommendations by viewModel.spotifyRecommendations.collectAsStateWithLifecycle()
+
+        if (spotifyRecommendations.isNotEmpty()) {
+            Column {
+                NavigationTitle(
+                    title = stringResource(R.string.spotify_recommendations),
+                    onClick = { /* Could go to a dedicated recs screen */ },
+                    modifier = Modifier,
+                )
+                LazyRow(
+                    contentPadding =
+                        WindowInsets.systemBars
+                            .only(WindowInsetsSides.Horizontal)
+                            .asPaddingValues(),
+                ) {
+                    items(
+                        items = spotifyRecommendations,
+                        key = { it.id },
+                    ) { item ->
+                        YouTubeGridItem(
+                            item = SongItem(
+                                id = item.id,
+                                title = item.name,
+                                artists = item.artists.map { com.harmber2.suadat.innertube.models.Artist(name = it.name, id = it.id.orEmpty()) },
+                                thumbnail = item.album?.images?.firstOrNull()?.url.orEmpty(),
+                                explicit = item.explicit
+                            ),
+                            isActive = item.id == mediaMetadata?.spotifyTrackId,
+                            isPlaying = isPlaying,
+                            coroutineScope = scope,
+                            modifier = Modifier
+                                .combinedClickable(
+                                    onClick = {
+                                        val spotifyRecommendationsList = spotifyRecommendations
+                                        val index = spotifyRecommendationsList.indexOf(item)
+                                        playerConnection.playQueue(
+                                            SpotifyRecommendationsQueue(
+                                                seedTracks = spotifyRecommendationsList,
+                                                startIndex = index.coerceAtLeast(0),
+                                                preloadItem = item.toMediaMetadata()
+                                            )
+                                        )
+                                    },
+                                    onLongClick = {
+                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                     }
                                 )
                         )

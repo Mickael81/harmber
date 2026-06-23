@@ -69,6 +69,9 @@ internal fun CanvasArtworkPlayer(
                 .addInterceptor { chain ->
                     val request = chain.request()
                     val host = request.url.host
+                    val isSpotifyHost = host.endsWith("spotify.com") || host.endsWith("spotifycdn.com")
+                    if (isSpotifyHost) return@addInterceptor chain.proceed(request)
+
                     val isYouTubeMediaHost =
                         host.endsWith("googlevideo.com") ||
                             host.endsWith("googleusercontent.com") ||

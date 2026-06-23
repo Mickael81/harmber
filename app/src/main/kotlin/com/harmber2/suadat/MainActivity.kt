@@ -272,7 +272,6 @@ import com.harmber2.suadat.ui.screens.search.OnlineSearchScreen
 import com.harmber2.suadat.ui.screens.search.decodeOnlineSearchQuery
 import com.harmber2.suadat.ui.screens.search.onlineSearchResultRoute
 import com.harmber2.suadat.ui.screens.settings.DarkMode
-import com.harmber2.suadat.ui.screens.settings.DiscordPresenceManager
 import com.harmber2.suadat.ui.screens.settings.NavigationTab
 import com.harmber2.suadat.ui.theme.HarmberTheme
 import com.harmber2.suadat.ui.theme.ColorSaver
@@ -432,7 +431,7 @@ class MainActivity : ComponentActivity() {
         // and do not clear it for transient configuration changes.
         if (isFinishing && !isChangingConfigurations) {
             try {
-                DiscordPresenceManager.stop()
+                com.harmber2.suadat.ui.screens.settings.DiscordPresenceManager.stop()
             } catch (_: Exception) {
             }
         }

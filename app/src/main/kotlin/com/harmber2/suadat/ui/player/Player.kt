@@ -206,6 +206,7 @@ import com.harmber2.suadat.extensions.togglePlayPause
 import com.harmber2.suadat.extensions.toggleRepeatMode
 import com.harmber2.suadat.models.MediaMetadata
 import com.harmber2.suadat.playback.PlayerConnection
+import com.harmber2.suadat.spotify.SpotifyCanvasManager
 import com.harmber2.suadat.ui.component.BigSeekBar
 import com.harmber2.suadat.ui.component.BottomSheet
 import com.harmber2.suadat.ui.component.BottomSheetPageState
@@ -435,7 +436,7 @@ fun BottomSheetPlayer(
 
     val aodModeEnabled by playerConnection.aodModeEnabled.collectAsStateWithLifecycle()
     val (thumbnailCornerRadius) = rememberPreference(ThumbnailCornerRadiusKey, defaultValue = 8f)
-    val archiveTuneCanvasEnabled by rememberPreference(HarmberCanvasKey, false)
+    val archiveTuneCanvasEnabled by rememberPreference(HarmberCanvasKey, true)
     val lowDataModeActive = rememberLowDataModeActive()
     val (maxCanvasCacheSize, _) =
         rememberPreference(
@@ -1035,12 +1036,14 @@ fun BottomSheetPlayer(
             archiveTuneCanvasEnabled &&
                 !lowDataModeActive &&
                 playerDesignStyle == PlayerDesignStyle.V7 &&
-                !aodModeEnabled
+                !aodModeEnabled &&
+                mediaMetadata != null
         val shouldUseArtworkCanvas =
             archiveTuneCanvasEnabled &&
                 !lowDataModeActive &&
                 (playerDesignStyle == PlayerDesignStyle.V8 || playerDesignStyle == PlayerDesignStyle.V9) &&
-                !aodModeEnabled
+                !aodModeEnabled &&
+                mediaMetadata != null
         var v7CanvasArtwork by remember(mediaMetadata?.id) {
             mutableStateOf<CanvasArtwork?>(null)
         }
@@ -1084,7 +1087,13 @@ fun BottomSheetPlayer(
             try {
                 val fetched =
                     withContext(Dispatchers.IO) {
-                        fetchCanvasArtworkForPlayback(
+                        SpotifyCanvasManager.getCanvas(
+                            context = context,
+                            mediaId = metadata.id,
+                            title = metadata.title,
+                            artist = metadata.artists.firstOrNull()?.name.orEmpty(),
+                            durationSec = metadata.duration
+                        ) ?: fetchCanvasArtworkForPlayback(
                             songTitleRaw = metadata.title,
                             artistNameRaw = artistNameRaw,
                             storefront = storefront,
@@ -1130,7 +1139,13 @@ fun BottomSheetPlayer(
             try {
                 val fetched =
                     withContext(Dispatchers.IO) {
-                        fetchCanvasArtworkForPlayback(
+                        SpotifyCanvasManager.getCanvas(
+                            context = context,
+                            mediaId = metadata.id,
+                            title = metadata.title,
+                            artist = metadata.artists.firstOrNull()?.name.orEmpty(),
+                            durationSec = metadata.duration
+                        ) ?: fetchCanvasArtworkForPlayback(
                             songTitleRaw = metadata.title,
                             artistNameRaw = artistNameRaw,
                             storefront = storefront,

@@ -480,9 +480,6 @@ object YTPlayerUtils {
                         playbackTracking = metadata.playbackTracking,
                     )
                 } else {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(App.instance, "Lossless unavailable, playing Opus", Toast.LENGTH_SHORT).show()
-                    }
                     return@runCatching playerResponseForPlaybackOnce(
                         videoId = videoId,
                         playlistId = playlistId,

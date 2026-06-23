@@ -258,6 +258,7 @@ import java.net.UnknownHostException
 import java.time.LocalDateTime
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 import kotlin.math.PI
@@ -334,7 +335,7 @@ class MusicService :
     private val audioQuality by enumPreference(
         this,
         AudioQualityKey,
-        com.harmber2.suadat.constants.AudioQuality.AUTO,
+        com.harmber2.suadat.constants.AudioQuality.HIGHEST,
     )
     private val preferredStreamClient by enumPreference(
         this,
@@ -342,12 +343,17 @@ class MusicService :
         PlayerStreamClient.ANDROID_VR,
     )
     private val playbackUrlCache = ConcurrentHashMap<String, AuthScopedCacheValue>()
+    private val failedExternalMediaIds = ConcurrentHashMap.newKeySet<String>()
     private val remotePlaybackTrackingUrlCache = ConcurrentHashMap<String, String>()
     private val contentLengthCache = ConcurrentHashMap<String, Long>()
     private val mediaOkHttpClient: OkHttpClient by lazy {
         OkHttpClient
             .Builder()
             .proxy(YouTube.streamOkHttpProxy)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .retryOnConnectionFailure(true)
             .followRedirects(true)
             .followSslRedirects(true)
             .addInterceptor { chain ->
@@ -2556,7 +2562,9 @@ class MusicService :
         val failedUrl = responseException.dataSpec.uri.toString()
         val requestProfile = StreamClientUtils.resolveRequestProfile(failedUrl)
         val authFingerprint = YouTube.currentPlaybackAuthState().fingerprint
-        val cachedFailedUrl = playbackUrlCache[mediaId]?.takeIf { it.url == failedUrl }
+        val cachedEntry = playbackUrlCache[mediaId]
+        val isExternal = cachedEntry?.authFingerprint == HiResLosslessPlaybackResolver.EXTERNAL_AUTH_FINGERPRINT
+        val cachedFailedUrl = cachedEntry?.takeIf { it.url == failedUrl }
         val failedExpiredUrl =
             YTPlayerUtils.isExpiredOrNearExpiredStreamUrl(failedUrl) ||
                 (
@@ -2567,6 +2575,11 @@ class MusicService :
                         )
                     } == true
                 )
+
+        if (isExternal && !failedExpiredUrl) {
+            Timber.tag("MusicService").w("Marking external stream failed for %s", mediaId)
+            failedExternalMediaIds.add(mediaId)
+        }
 
         playbackUrlCache.remove(mediaId)
         YTPlayerUtils.invalidateCachedStreamUrls(mediaId)
@@ -4928,6 +4941,10 @@ class MusicService :
 
         val timelineEmpty = player.currentTimeline.isEmpty || player.mediaItemCount == 0 || player.currentMediaItem == null
         currentMediaMetadata.value = if (timelineEmpty) null else (mediaItem?.metadata ?: player.currentMetadata)
+        
+        if (mediaItem != null) {
+            failedExternalMediaIds.remove(mediaItem.mediaId)
+        }
 
         widgetUpdater.update()
 
@@ -5830,7 +5847,7 @@ class MusicService :
         }
 
         val lowDataModeActive = isLowDataModeActive()
-        val hiResLosslessSelected = preferredStreamClient == PlayerStreamClient.HI_RES_LOSSLESS
+        val hiResLosslessSelected = preferredStreamClient == PlayerStreamClient.HI_RES_LOSSLESS && !failedExternalMediaIds.contains(mediaId)
         val authFingerprint =
             if (hiResLosslessSelected) {
                 HiResLosslessPlaybackResolver.EXTERNAL_AUTH_FINGERPRINT
@@ -5872,7 +5889,7 @@ class MusicService :
                         retryWithoutPlaybackLoginContext {
                             YTPlayerUtils.playerResponseForPlayback(
                                 mediaId,
-                                audioQuality = if (lowDataModeActive) AudioQuality.LOW else audioQuality,
+                                audioQuality = if (lowDataModeActive) AudioQuality.LOW else AudioQuality.HIGHEST,
                                 connectivityManager = connectivityManager,
                                 preferredStreamClient = PlayerStreamClient.WEB_REMIX,
                                 networkMetered = lowDataModeActive,
@@ -5880,10 +5897,11 @@ class MusicService :
                         }.getOrThrow()
                     }
                 } else {
+                    val fallbackQuality = if (failedExternalMediaIds.contains(mediaId) && audioQuality == AudioQuality.LOSSLESS) AudioQuality.HIGHEST else audioQuality
                     retryWithoutPlaybackLoginContext {
                         YTPlayerUtils.playerResponseForPlayback(
                             mediaId,
-                            audioQuality = if (lowDataModeActive) AudioQuality.LOW else audioQuality,
+                            audioQuality = if (lowDataModeActive) AudioQuality.LOW else fallbackQuality,
                             connectivityManager = connectivityManager,
                             preferredStreamClient = preferredStreamClient,
                             networkMetered = lowDataModeActive,
@@ -6883,13 +6901,13 @@ class MusicService :
         const val CROSSFADE_HANDOFF_SEEK_GUARD_MS = 750L
         const val CROSSFADE_MIN_BUFFER_BEFORE_START_MS = 5_000L
         const val CROSSFADE_MAX_BUFFER_BEFORE_START_MS = 12_500L
-        const val PRIMARY_MIN_BUFFER_MS = 20_000
-        const val PRIMARY_MAX_BUFFER_MS = 60_000
-        const val PRIMARY_BUFFER_FOR_PLAYBACK_MS = 750
-        const val PRIMARY_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS = 2_500
+        const val PRIMARY_MIN_BUFFER_MS = 30_000
+        const val PRIMARY_MAX_BUFFER_MS = 90_000
+        const val PRIMARY_BUFFER_FOR_PLAYBACK_MS = 2_500
+        const val PRIMARY_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS = 5_000
         const val CROSSFADE_MIN_BUFFER_MS = 15_000
         const val CROSSFADE_MAX_BUFFER_MS = 45_000
-        const val CROSSFADE_FRAME_MS = 32L
+        const val CROSSFADE_FRAME_MS = 16L
         const val MIN_AUDIBLE_EFFECTIVE_VOLUME = 0.01f
         const val STUCK_MUTED_VOLUME_EPSILON = 0.001f
         const val AUDIBLE_PLAYBACK_VOLUME_CHECK_MS = 2_000L

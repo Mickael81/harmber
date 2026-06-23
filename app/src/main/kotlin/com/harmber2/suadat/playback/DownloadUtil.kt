@@ -66,7 +66,7 @@ class DownloadUtil
         @PlayerCache val playerCache: Cache,
     ) {
         private val connectivityManager = context.getSystemService<ConnectivityManager>()!!
-        private val audioQuality by enumPreference(context, AudioQualityKey, AudioQuality.AUTO)
+        private val audioQuality by enumPreference(context, AudioQualityKey, AudioQuality.HIGHEST)
         private val downloadScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         private val songUrlCache = ConcurrentHashMap<String, AuthScopedCacheValue>()
         private val downloadExecutor = Executors.newFixedThreadPool(DEFAULT_MAX_PARALLEL_DOWNLOADS)
