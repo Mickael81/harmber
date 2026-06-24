@@ -203,10 +203,10 @@ If you find Harmber useful:
 
 ---
 
-##Special Thanks
+**Special Thanks
 Inner tune
 metrolist
-archive tune
+archive tune**
 
 ## License
 
