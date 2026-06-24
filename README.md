@@ -204,9 +204,9 @@ If you find Harmber useful:
 ---
 
 **Special Thanks
-Inner tune
-metrolist
-archive tune**
+Innertune
+metrolist and
+archivetune for the base framework**
 
 ## License
 
