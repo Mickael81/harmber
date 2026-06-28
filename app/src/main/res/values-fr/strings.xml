@@ -4,36 +4,36 @@ verb vs noun --><!-- "InnerTune" is replaced with "harmber" --><!-- Translators:
 InnerTune's Weblate instead. -->
 <resources>
     <!-- Bottom navigation -->
-    <string name="home">Home</string>
-    <string name="songs">Songs</string>
-    <string name="artists">Artists</string>
+    <string name="home">Accueil</string>
+    <string name="songs">Titres</string>
+    <string name="artists">Artistes</string>
     <string name="albums">Albums</string>
     <string name="playlists">Playlists</string>
     <!-- Top bar -->
     <plurals name="n_selected">
-        <item quantity="other">%d selected</item>
+        <item quantity="other">%d sélectionnés</item>
     </plurals>
     <!-- Home -->
-    <string name="history">History</string>
-    <string name="stats">Stats</string>
-    <string name="mood_and_genres">Mood &amp; Genres</string>
-    <string name="mood_and_genres_supporting">Play by feeling, era, or energy</string>
-    <string name="mood_and_genres_count">%d picks</string>
-    <string name="account">Account</string>
-    <string name="quick_picks">Quick picks</string>
-    <string name="quick_picks_empty">Listen to songs to generate your quick picks</string>
-    <string name="speed_dial">Speed dial</string>
-    <string name="speed_dial_random">Play random speed dial song</string>
-    <string name="forgotten_favorites">Forgotten favorites</string>
-    <string name="keep_listening">Keep listening</string>
-    <string name="your_youtube_playlists">Your YouTube playlists</string>
-    <string name="similar_to">Similar to</string>
-    <string name="new_release_albums">New release albums</string>
-    <string name="select_playlist_to_sync">Select Playlist To Sync</string>
-    <string name="integration">Integration</string>
-    <string name="integrations">Integrations</string>
-    <string name="internal_subcategory_settings">Internal &amp; subcategory settings</string>
-    <string name="search_try_different">Try a different search term</string>
+    <string name="history">Historique</string>
+    <string name="stats">Statistiques</string>
+    <string name="mood_and_genres">Ambiance &amp; Genres</string>
+    <string name="mood_and_genres_supporting">Écoutez en fonction de vos sensations, d\'une époque ou d\'une énergie</string>
+    <string name="mood_and_genres_count">%d sélections</string>
+    <string name="account">Compte</string>
+    <string name="quick_picks">Sélection Rapide</string>
+    <string name="quick_picks_empty">Écoutez des titres pour générer votre Sélection Rapide</string>
+    <string name="speed_dial">Accès Rapide</string>
+    <string name="speed_dial_random">Lire un titre au hasard de la liste de numéros abrégés</string>
+    <string name="forgotten_favorites">Coups de Cœur Oubliés</string>
+    <string name="keep_listening">Continuez à écouter</string>
+    <string name="your_youtube_playlists">Vos Playlists YouTube</string>
+    <string name="similar_to">Semblable à</string>
+    <string name="new_release_albums">Nouveautés</string>
+    <string name="select_playlist_to_sync">Sélectionnez la playlist à synchroniser</string>
+    <string name="integration">Intégration</string>
+    <string name="integrations">Intégrations</string>
+    <string name="internal_subcategory_settings">Paramètres internes &amp; de sous-catégories</string>
+    <string name="search_try_different">Essayez un autre terme de recherche</string>
     <!-- History -->
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
